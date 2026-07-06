@@ -31,6 +31,7 @@ AES-00 Project DNA · ATLAS Spec Repo · ATLAS Master Specification · 01 Produc
 | ADR-009 | Event Sourcing Ready | Accepted |
 | **ADR-010** | **Phase 1 Scope Reduction** | **Accepted — nuevo, cierra gap crítico** |
 | **ADR-011** | **Claude as Primary AI Provider** | **Accepted — nuevo** |
+| **ADR-011-A** | **Free Provider Testing Override (config-gated)** | **Accepted — nuevo. Override temporal a modelo gratuito para L3 en testing vía `REVENUE_AGENT_PROVIDER`; ADR-011 sigue vigente en prod** |
 
 ## 3. RFC — Propuestas Funcionales (10)
 
