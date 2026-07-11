@@ -50,6 +50,7 @@
 | Competidores por unidad con comparabilidad (`applies_to_unit_id`, `adjustment_note`) | HECHO | 2026-07-08 | ADR-015 (carga manual), DOC-0031 §3 |
 | Transparencia en recomendación (competidor: nombre+precio+link+unidad+nota) | HECHO | 2026-07-08 | — (mejora Fase 1) |
 | Guardrail no-inventar m²/características (usa nota o compara crudo y lo aclara) | HECHO | 2026-07-08 | ARCH-0028 |
+| Fix: pricing COMPARA base vs competidores (ajustados) y recomienda subir/bajar/mantener — ya no repite el base | HECHO | 2026-07-11 | RFC-0008 (bug de instrucción, evidencia en dump-prompt.mts) |
 | Ingesta de competidores reales de LindaBay (10 filas cargadas) | HECHO | 2026-07-08 | ADR-015 |
 | Webhook Telegram serverless (Vercel) reemplaza polling | HECHO | 2026-07-08 | ADR-003-A |
 | Deploy a Vercel (atlas-mvp-pink.vercel.app) + webhook registrado | HECHO | 2026-07-08 | DOC-0017 |
