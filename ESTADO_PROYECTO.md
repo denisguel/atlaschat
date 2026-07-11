@@ -74,10 +74,24 @@
 
 ---
 
-## FASE 2 — Diferido (con registro)
+## FASE 2
 
+### Parte 1 — Motor de pricing correcto (HECHO)
+| Ítem | Estado | Fecha | Respaldo |
+|---|---|---|---|
+| Tablas del modelo de tarifas (rate_seasons, rate_season_dates, unit_rates) + RLS | HECHO | 2026-07-11 | SPEC-PRICING-MODEL §1, DOC-0031 §3 |
+| Motor resolver-precio L0 (per_night L-J/V-D, package, cruce de temporadas, desglose) | HECHO | 2026-07-11 | SPEC-PRICING-MODEL §1 |
+| Cotización multi-unidad cruzada con capacidad (devuelve TODAS las que sirven) | HECHO | 2026-07-11 | SPEC-PRICING-MODEL §4 pto 3 |
+| Interfaz `/pricing "N personas + fechas"` → motor de tarifas (por comando) | HECHO | 2026-07-11 | SPEC-PRICING-MODEL §4 |
+| Guardrail: el motor nunca inventa tarifa ausente (lo dice explícito) | HECHO | 2026-07-11 | SPEC-PRICING-MODEL §1 |
+| Tests del motor (9: per_night, package, min_nights, cruce, guardrail, multi-unidad) | HECHO | 2026-07-11 | DOC-0033 |
+
+### Parte 2 — Diferido (con registro)
 | Ítem | Estado | Respaldo |
 |---|---|---|
+| Scraper competencia por fecha (Booking + motor lindabay.com.ar) | DIFERIDO | SPEC-PRICING-MODEL §2, ADR-015 |
+| AI Orchestrator + conversación libre (cotización → negociación) | DIFERIDO | SPEC-PRICING-MODEL §4, RFC-0002 |
+| Calendario de precios en dashboard | DIFERIDO | SPEC-PRICING-MODEL §5, ARCH-0023 |
 | AI Orchestrator | DIFERIDO | ADR-010, RFC-0002 / ARCH-0012 |
 | Context Builder (context real, no piso mínimo) | DIFERIDO | ADR-010, ARCH-0029 |
 | Property Brain / Guest Brain / Growth Brain (memoria vectorial) | DIFERIDO | ADR-010, RFC-0003 / ARCH-0013 |
