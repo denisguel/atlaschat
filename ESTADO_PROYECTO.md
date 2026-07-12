@@ -86,12 +86,22 @@
 | Guardrail: el motor nunca inventa tarifa ausente (lo dice explícito) | HECHO | 2026-07-11 | SPEC-PRICING-MODEL §1 |
 | Tests del motor (9: per_night, package, min_nights, cruce, guardrail, multi-unidad) | HECHO | 2026-07-11 | DOC-0033 |
 
-### Parte 2 — Diferido (con registro)
-| Ítem | Estado | Respaldo |
-|---|---|---|
-| Scraper competencia por fecha (Booking + motor lindabay.com.ar) | DIFERIDO | SPEC-PRICING-MODEL §2, ADR-015 |
-| AI Orchestrator + conversación libre (cotización → negociación) | DIFERIDO | SPEC-PRICING-MODEL §4, RFC-0002 |
-| Calendario de precios en dashboard | DIFERIDO | SPEC-PRICING-MODEL §5, ARCH-0023 |
+### Parte 2 — Inteligencia de decisión (EN CURSO)
+| Ítem | Estado | Fecha | Respaldo |
+|---|---|---|---|
+| Paso 1a: inferir unit_rates desde pricing_history real (source='inferred_from_history') | HECHO | 2026-07-11 | DOMAIN_KNOWLEDGE §3.3 |
+| Paso 1b: reconectar competencia real con ajuste de comparabilidad numérico (adjustment_pct) | HECHO | 2026-07-11 | DOMAIN_KNOWLEDGE §1.6 |
+| Paso 2: motor de decisión (analyze.ts): tarifa + competencia ajustada + ocupación histórica + techo → subir/bajar/mantener con justificación | HECHO | 2026-07-11 | DOMAIN_KNOWLEDGE §2.3 |
+| Tabla pricing_ceilings (techo por propiedad) + RLS | HECHO | 2026-07-11 | DOMAIN_KNOWLEDGE §1.4 |
+| Guardrail: competencia solo decide dirección si es de la fecha consultada (fix de BUG) | HECHO | 2026-07-11 | DOMAIN_KNOWLEDGE §2.2 |
+| Paso 3: AI Orchestrator conversacional (intención + memoria de hilo + negociación) | PENDIENTE | — | DOMAIN_KNOWLEDGE §3.4, RFC-0002 |
+| Paso 4: scraper de competencia POR FECHA (Booking + motor lindabay.com.ar) | PENDIENTE | — | DOMAIN_KNOWLEDGE §1.5, ADR-015 |
+| Calendario de precios en dashboard | DIFERIDO | — | SPEC-PRICING-MODEL §5, ARCH-0023 |
+
+**Gaps de datos abiertos (reportados, no inventados — DOMAIN_KNOWLEDGE §3.2):**
+- 🔴 `reservations` vacía → ocupación ACTUAL del período, booking pace y gap nights NO calculables. La decisión hoy usa ocupación HISTÓRICA como contexto y lo marca. Cargar reservas (con timestamp de reserva para pace) desbloquea §2.2 completo.
+- 🟡 Competencia sin fecha: los 10 competidores son de 2026-08-04; para decidir dirección se necesita competencia de la fecha consultada (Paso 4).
+- 🟡 Techo actual es un valor de EJEMPLO (USD 180); el propietario debe definir el real (§4).
 | AI Orchestrator | DIFERIDO | ADR-010, RFC-0002 / ARCH-0012 |
 | Context Builder (context real, no piso mínimo) | DIFERIDO | ADR-010, ARCH-0029 |
 | Property Brain / Guest Brain / Growth Brain (memoria vectorial) | DIFERIDO | ADR-010, RFC-0003 / ARCH-0013 |
