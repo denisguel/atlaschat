@@ -94,12 +94,15 @@
 | Paso 2: motor de decisión (analyze.ts): tarifa + competencia ajustada + ocupación histórica + techo → subir/bajar/mantener con justificación | HECHO | 2026-07-11 | DOMAIN_KNOWLEDGE §2.3 |
 | Tabla pricing_ceilings (techo por propiedad) + RLS | HECHO | 2026-07-11 | DOMAIN_KNOWLEDGE §1.4 |
 | Guardrail: competencia solo decide dirección si es de la fecha consultada (fix de BUG) | HECHO | 2026-07-11 | DOMAIN_KNOWLEDGE §2.2 |
+| Umbrales operativos: booking pace (ratios), gap por temporada, revenue simulator, maximize_revenue | HECHO | 2026-07-11 | DOMAIN_KNOWLEDGE §5.1-5.4 (decision.ts, testeado) |
+| Explicabilidad §5.5 (7 elementos) + bandas de autonomía §5.6 OFF (BDVL requires_confirmation) | HECHO | 2026-07-11 | DOMAIN_KNOWLEDGE §5.5-5.6 |
 | Paso 3: AI Orchestrator conversacional (intención + memoria de hilo + negociación) | PENDIENTE | — | DOMAIN_KNOWLEDGE §3.4, RFC-0002 |
 | Paso 4: scraper de competencia POR FECHA (Booking + motor lindabay.com.ar) | PENDIENTE | — | DOMAIN_KNOWLEDGE §1.5, ADR-015 |
 | Calendario de precios en dashboard | DIFERIDO | — | SPEC-PRICING-MODEL §5, ARCH-0023 |
 
 **Gaps de datos abiertos (reportados, no inventados — DOMAIN_KNOWLEDGE §3.2):**
-- 🔴 `reservations` vacía → ocupación ACTUAL del período, booking pace y gap nights NO calculables. La decisión hoy usa ocupación HISTÓRICA como contexto y lo marca. Cargar reservas (con timestamp de reserva para pace) desbloquea §2.2 completo.
+- 🔴 `reservations` vacía **Y** `pricing_history` sin timestamp de reserva → booking pace (§5.2), ocupación ACTUAL y gap nights NO calculables. La LÓGICA está construida y testeada; falta el DATO. Desbloqueo: cargar reservations con fecha-de-reserva (booking date), no solo fecha de estadía.
+- 🔴 Elasticidad para el revenue simulator (§5.4): sin histórico de elasticidad no se infiere (§5.3). Corre solo con supuesto explícito del propietario. Desbloqueo: histórico de (precio → ocupación lograda) o supuesto declarado.
 - 🟡 Competencia sin fecha: los 10 competidores son de 2026-08-04; para decidir dirección se necesita competencia de la fecha consultada (Paso 4).
 - 🟡 Techo actual es un valor de EJEMPLO (USD 180); el propietario debe definir el real (§4).
 | AI Orchestrator | DIFERIDO | ADR-010, RFC-0002 / ARCH-0012 |
