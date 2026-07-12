@@ -241,13 +241,155 @@ Marco de decisión:
 
 ---
 
-# PARTE 4 — LO QUE FALTA DEFINIR (preguntas abiertas al propietario)
+# PARTE 4 — LO QUE FALTA DEFINIR
 
-Estas son las únicas cosas que el sistema NO puede inferir y que el propietario debe definir:
+**Ya definido por el propietario** (ver Parte 5): gap nights por temporada, booking pace (arranca sep/oct), objetivo = maximizar ingresos.
 
-1. **Sus tarifas reales por temporada** (o dejar que se infieran del histórico + scraping y confirmarlas)
-2. **El techo concreto** (¿cuánto cuesta la semana en Brasil equivalente? ¿o prefiere un % sobre competencia?)
-3. **Qué competidores de Booking son comparables a cada unidad** (con su ajuste)
-4. **Su objetivo:** ¿maximizar ocupación, maximizar precio, o balancear? (cambia toda la lógica de recomendación)
+**Pendiente:**
+1. **Tarifas reales por temporada** — se INFIEREN del histórico ya cargado + scraping; el propietario confirma. NO cargar a mano.
+2. **El techo concreto** (§1.4): ¿costo de semana equivalente en Brasil? ¿o % sobre competencia local? → configurable por propiedad.
+3. **Elasticidad de precio:** se estima del histórico propio (§5.3). Si no alcanza, el sistema declara baja confianza — nunca inventa.
 
-Todo lo demás está en este documento.
+---
+
+# PARTE 5 — LÓGICA OPERATIVA DE REVENUE (umbrales y reglas concretas)
+
+**Por qué esta parte existe:** el corpus define conceptos ("gap night optimization", "booking pace") pero nunca los umbrales operativos. Sin ellos, el sistema improvisa reglas inventadas. Esta parte los fija con el criterio del propietario.
+
+## 5.1 Gap nights — la definición depende de la TEMPORADA (no es un número fijo)
+
+**Insight crítico del propietario:** un "gap" no es un número universal de noches. Es una vacancia que **no puede venderse bajo las reglas de esa temporada**. Como el mínimo de estadía cambia por temporada, el gap cambia con él.
+
+| Temporada | Qué constituye un gap | Acción sugerida |
+|---|---|---|
+| **Baja/media** (per_night) | **1 noche suelta** ya es un gap | Ofrecer a huéspedes de la reserva anterior o posterior (extender su estadía). Es la vía más barata: ya están ahí, cero costo de adquisición |
+| **Finde largo** (paquete 3 noches) | Si alguien reserva solo 2 de las 3 noches → queda 1 noche huérfana | Ofrecer extensión al huésped del finde, o vender suelta con precio agresivo |
+| **Vacaciones de invierno** (paquetes 4/7) | **2 noches** sueltas = gap (no llegan al paquete mínimo de 4) | Precio agresivo o flexibilizar mínimo |
+| **Alta temporada** (paquete 7 noches) | **3-4 noches** = gap (no completan la semana mínima) | El más costoso. Opciones: flexibilizar el mínimo para esas fechas, precio agresivo, o aceptar la pérdida si falta mucho tiempo (puede llegar una semana completa) |
+
+**Regla operativa:**
+1. Detectar vacancias entre reservas confirmadas
+2. Clasificar según la temporada de esas fechas (tabla arriba)
+3. **Primera acción SIEMPRE: ofrecer extensión a huéspedes adyacentes** (anterior o posterior). Costo de adquisición = 0
+4. Si no funciona: precio agresivo (el propietario define el % — punto de partida sugerido: 15-25% según cercanía de la fecha)
+5. **Cuanto más cerca la fecha, más agresivo** — una noche vacía es ingreso perdido para siempre
+
+**Guardrail:** en alta temporada, NO flexibilizar el mínimo de 7 noches con mucha anticipación (puede llegar una semana completa que vale más). Flexibilizar solo cuando la fecha se acerca y el riesgo de vacancia total es alto.
+
+## 5.2 Booking pace — cómo se mide y cuándo alarma
+
+**Cuándo empieza a venderse la alta temporada:** desde **septiembre/octubre** (3-4 meses antes de enero). Ese es el arranque de la curva.
+
+**Cómo calcular el pace:**
+```
+pace_actual = noches vendidas para [período target] al día de hoy
+pace_referencia = noches vendidas para [mismo período] a la misma distancia temporal, en años anteriores
+                  (de pricing_history + reservations históricas)
+
+ratio = pace_actual / pace_referencia
+```
+
+**Interpretación:**
+| Ratio | Diagnóstico | Acción |
+|---|---|---|
+| > 1.15 | **Adelantado** — se vende más rápido que el histórico | Oportunidad de SUBIR precio: hay más demanda que la esperada |
+| 0.85 – 1.15 | **En línea** | Mantener, ajuste fino |
+| 0.60 – 0.85 | **Atrasado** | Revisar precio vs. competencia. Considerar bajar o promocionar |
+| < 0.60 | **Muy atrasado — alerta** | Acción correctiva urgente: bajar precio, promocionar, revisar si hay problema de mercado (no solo de precio) |
+
+**Ajuste por cercanía:** el mismo ratio significa cosas distintas según cuánto falte:
+- A 4+ meses: un pace atrasado no es alarmante todavía (hay tiempo)
+- A 2 meses: atrasado = actuar ya
+- A 3 semanas: atrasado = precio agresivo, es la última ventana
+
+**Importante:** comparar contra el histórico del MISMO ciclo económico cuando sea posible. Un enero con dólar caro no es comparable a uno con dólar barato (§1.4).
+
+## 5.3 El objetivo: MAXIMIZAR INGRESOS (no ocupación, no precio)
+
+**Definición del propietario, y es la correcta:** el objetivo NO es llenar a cualquier precio, ni sostener el precio a costa de quedar vacío. **Es maximizar el revenue total.**
+
+```
+Revenue = precio × noches vendidas
+```
+
+**Implicancia para el sistema:** si bajar el precio genera suficiente ocupación adicional como para que el revenue total suba, **bajar es la recomendación correcta.** Y viceversa.
+
+**Configurable por propietario:** el sistema debe permitir que cada propietario elija su estrategia:
+- `maximize_revenue` (default, recomendado)
+- `maximize_occupancy` (llenar, aunque el revenue sea menor — útil para propietarios que priorizan reviews/actividad)
+- `maximize_rate` (sostener precio, aceptar vacancia — útil para propiedades premium)
+
+**Cómo el sistema evalúa "maximizar ingresos":**
+1. Estimar la elasticidad: ¿cuánta ocupación adicional genera bajar X%?
+   - **Fuente inicial:** histórico propio (si bajé 10% en el pasado, ¿cuánto más vendí?)
+   - **Si no hay histórico suficiente:** usar competencia y pace como proxy, y **decirlo explícitamente** ("estimación de baja confianza, sin histórico de elasticidad")
+2. Proyectar revenue en cada escenario (mantener / subir X% / bajar X%)
+3. Recomendar el de mayor revenue proyectado
+4. **Mostrar la proyección al propietario** (no solo el número final)
+
+**Guardrail:** NUNCA inventar una elasticidad. Si no hay datos para estimarla, decirlo y presentar escenarios con supuestos explícitos ("si bajar 10% aumentara la ocupación 20%, el revenue subiría $X — pero no tengo histórico para confirmar esa elasticidad").
+
+## 5.4 Revenue Simulator / What-if (RFC-0008 §28, operacionalizado)
+
+**Qué debe simular:**
+| Escenario | Proyecta |
+|---|---|
+| Mantener precio actual | Ocupación esperada (según pace + histórico), revenue proyectado |
+| Subir X% | Ocupación esperada (menor), revenue proyectado |
+| Bajar X% | Ocupación esperada (mayor), revenue proyectado |
+
+**Salida esperada (lo que ve el propietario):**
+```
+Si mantenés $1000/semana: ~65% ocupación proyectada → revenue ~$X
+Si bajás a $950: ~85% ocupación proyectada → revenue ~$Y  ← mayor
+Si subís a $1100: ~45% ocupación proyectada → revenue ~$Z
+
+Recomiendo bajar a $950. Diferencia vs. mantener: +$[Y-X]
+```
+
+**Supuestos obligatorios a declarar:** de dónde sale la estimación de ocupación (histórico propio / pace actual / competencia), y su nivel de confianza.
+
+## 5.5 Explicabilidad (Principio 15, operacionalizado)
+
+**Toda recomendación de precio DEBE contener:**
+1. **Temporada y modelo** aplicado ("Enero, paquete semanal, mínimo 7 noches")
+2. **Competencia comparable de esa fecha**, con nombre + precio + link, ajustada por comparabilidad
+3. **Ocupación actual** del período
+4. **Booking pace** vs. histórico ("vas 30% atrasado respecto al año pasado a esta altura")
+5. **La decisión**: subir/bajar/mantener + **el porqué en 1-2 frases**
+6. **Proyección de impacto** (§5.4) si el propietario quiere profundizar
+7. Si hay techo cerca (§1.4), **marcarlo explícitamente**
+
+**Prohibido:** dar un número sin las razones. El propietario no aprueba un precio, aprueba una estrategia.
+
+## 5.6 Bandas de autonomía (BDVL) — CUÁNDO SÍ y CUÁNDO NO
+
+Propuesta original: "la IA ajusta automáticamente si el cambio es <5% y confianza >95%".
+
+**Veredicto del panel: NO todavía. Peligroso antes de validar.**
+
+- El propietario aún no confía en el motor (con razón — está recién construido)
+- Auto-aplicar precios sin supervisión, con un motor no validado, puede destruir revenue real
+- **Regla:** bandas de autonomía se habilitan SOLO después de que el propietario haya validado N recomendaciones manualmente y confíe en el criterio del sistema
+
+**Cuándo habilitarlas (criterio):**
+- El propietario aprobó ≥20 recomendaciones y el sistema acertó (la ocupación/revenue resultante fue el proyectado)
+- Recién entonces: permitir auto-aplicar cambios menores (<5%) con confianza alta, y SIEMPRE notificando ("ajusté el precio de X a Y automáticamente, podés revertirlo")
+- Cambios grandes, temporada alta, o baja confianza → SIEMPRE aprobación humana
+
+Esto cumple Principio 17 (Progressive Intelligence) sin arriesgar el negocio del propietario.
+
+---
+
+# PARTE 6 — MEJORAS FUTURAS (Fase 3+, registradas, NO construir ahora)
+
+Del análisis de mejoras "10/10" — valiosas pero requieren componentes que no existen:
+
+| Mejora | Requiere | Fase |
+|---|---|---|
+| Simulación cruzada precio + marketing | Growth Brain | 3 |
+| Gap night → evento → Growth Agent genera post automático | Growth Agent + Event Bus | 3 |
+| Pricing personalizado por LTV del huésped | Guest Brain. **Nota: evaluar implicancias de discriminación de precios antes de implementar** | 3 |
+| **Inteligencia externa vía MCP (AirDNA, clima, eventos)** | **Alineado con ADR-012 — es el moat agéntico** | **2** |
+| Explicabilidad visual (curva de reserva actual vs. proyectada) | Dashboard | 2 |
+| Bandas de autonomía | Validación previa del motor (§5.6) | 2-3, con criterio |
