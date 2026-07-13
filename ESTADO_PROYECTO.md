@@ -98,6 +98,10 @@
 | Explicabilidad §5.5 (7 elementos) + bandas de autonomía §5.6 OFF (BDVL requires_confirmation) | HECHO | 2026-07-11 | DOMAIN_KNOWLEDGE §5.5-5.6 |
 | Paso 3: AI Orchestrator conversacional (router de intención sin comandos + memoria de hilo + negociación + registro de reservas) | HECHO | 2026-07-13 | DOMAIN_KNOWLEDGE §3.4 (agent_conversations, router/respond/memory) |
 | Registrar reserva desde la conversación (created_at = fecha de reserva → habilita pace futuro) | HECHO | 2026-07-13 | DOMAIN_KNOWLEDGE §5 pto 5 |
+| Feedback uso real #1: reglas de negocio al BACKEND determinista, no al LLM (min_nights/package_nights coexisten) | HECHO | 2026-07-13 | ARCH-0026 |
+| Feedback #2: decisión = revenue management, no mediana (anomalías sobre precio crudo + posición histórica + ancla en tarifa) | HECHO | 2026-07-13 | DOMAIN_KNOWLEDGE §2.3/§5.3 |
+| Feedback #3: memoria de hilo por compresión a hechos + herencia determinística de entidades + aliases de unidad | HECHO | 2026-07-13 | Principio 6 |
+| Feedback #4: formato Telegram compacto (negrita, un competidor por línea, no repetir) | HECHO | 2026-07-13 | ARCH-0023 |
 | Paso 4: scraper de competencia POR FECHA (Booking + motor lindabay.com.ar) | PENDIENTE | — | DOMAIN_KNOWLEDGE §1.5, ADR-015 |
 | Calendario de precios en dashboard | DIFERIDO | — | SPEC-PRICING-MODEL §5, ARCH-0023 |
 
