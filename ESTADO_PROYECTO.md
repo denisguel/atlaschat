@@ -96,7 +96,8 @@
 | Guardrail: competencia solo decide dirección si es de la fecha consultada (fix de BUG) | HECHO | 2026-07-11 | DOMAIN_KNOWLEDGE §2.2 |
 | Umbrales operativos: booking pace (ratios), gap por temporada, revenue simulator, maximize_revenue | HECHO | 2026-07-11 | DOMAIN_KNOWLEDGE §5.1-5.4 (decision.ts, testeado) |
 | Explicabilidad §5.5 (7 elementos) + bandas de autonomía §5.6 OFF (BDVL requires_confirmation) | HECHO | 2026-07-11 | DOMAIN_KNOWLEDGE §5.5-5.6 |
-| Paso 3: AI Orchestrator conversacional (intención + memoria de hilo + negociación) | PENDIENTE | — | DOMAIN_KNOWLEDGE §3.4, RFC-0002 |
+| Paso 3: AI Orchestrator conversacional (router de intención sin comandos + memoria de hilo + negociación + registro de reservas) | HECHO | 2026-07-13 | DOMAIN_KNOWLEDGE §3.4 (agent_conversations, router/respond/memory) |
+| Registrar reserva desde la conversación (created_at = fecha de reserva → habilita pace futuro) | HECHO | 2026-07-13 | DOMAIN_KNOWLEDGE §5 pto 5 |
 | Paso 4: scraper de competencia POR FECHA (Booking + motor lindabay.com.ar) | PENDIENTE | — | DOMAIN_KNOWLEDGE §1.5, ADR-015 |
 | Calendario de precios en dashboard | DIFERIDO | — | SPEC-PRICING-MODEL §5, ARCH-0023 |
 
