@@ -110,7 +110,8 @@
 | Paso 4: fetch de precios REALES de Booking vía Bright Data (dataset gd_mdy9ld3p1e0oqlj9g4) + competencia por fecha en analyze | HECHO | 2026-07-14 | key activa; evidencia real (Linda Bay 202 $136.67, 205 $125 por stay_date) |
 | Paso 4: SSOT `competitor_prices` (serie temporal por stay_date) + adapter_type enum (BOOKING_MANAGED/WEB_DIRECT_API) | HECHO | 2026-07-14 | RFC-0008 |
 | Paso 4: WEB_DIRECT_API config-driven (PXSOL) + KPIs (RatePerDay sin promediar, availability→pace, lead_time, SKU→unidad) | HECHO | 2026-07-14 | ARCH-0026, RFC-0008 (parse probado con fixture) |
-| Paso 4: PXSOL fetch en vivo (Reserva Directo, el techo) | BLOQUEADO | — | adapter pega a la API real y relata su error; falta el `body_template` exacto (capturar request del widget → config, no código) |
+| Paso 4: PXSOL fetch en vivo (Reserva Directo, el techo) | HECHO | 2026-07-14 | GET+Referer+SearchID capturado; SkuID 14014→UF214 = USD 175.44/noche real (250k ARS/blue) en competitor_prices |
+| Paso 4: SearchID dinámico por fecha (POST search) para consultar fechas arbitrarias | PENDIENTE | — | el SearchID actual fija las fechas de su sesión; falta el endpoint de creación de búsqueda |
 | Paso 4: scheduling (cron diario 30 días) + mapeo SKU 14014-14020 → UFs | PENDIENTE | — | ARCH-0027; el scrape corre por script/cron (poll de minutos), no en el webhook |
 | Calendario de precios en dashboard | DIFERIDO | — | SPEC-PRICING-MODEL §5, ARCH-0023 |
 
