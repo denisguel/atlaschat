@@ -102,6 +102,10 @@
 | Feedback #2: decisión = revenue management, no mediana (anomalías sobre precio crudo + posición histórica + ancla en tarifa) | HECHO | 2026-07-13 | DOMAIN_KNOWLEDGE §2.3/§5.3 |
 | Feedback #3: memoria de hilo por compresión a hechos + herencia determinística de entidades + aliases de unidad | HECHO | 2026-07-13 | Principio 6 |
 | Feedback #4: formato Telegram compacto (negrita, un competidor por línea, no repetir) | HECHO | 2026-07-13 | ARCH-0023 |
+| Fase 3 estabilidad #1: anomalías por divergencia estadística (IQR/Tukey) — casos A/B + muestra <4 low_confidence | HECHO | 2026-07-13 | RFC-0008 (test) |
+| Fase 3 #2: anti-silent-failure (mensaje intermedio a 8s + try/catch que siempre responde) + maxDuration=30 | HECHO | 2026-07-13 | ARCH-0025/0027 |
+| Fase 3 #3: higiene de contexto — al LLM solo datos filtrados (no excluidos); prohibido decir "no calculado" con target; herencia SSOT | HECHO | 2026-07-13 | ARCH-0029 / Principio 10 |
+| Fase 3 #4: toda escritura por BDVL (registro de reserva graba bdvl_decisions) | HECHO | 2026-07-13 | ARCH-0022/0026 |
 | Paso 4: scraper de competencia POR FECHA (Booking + motor lindabay.com.ar) | PENDIENTE | — | DOMAIN_KNOWLEDGE §1.5, ADR-015 |
 | Calendario de precios en dashboard | DIFERIDO | — | SPEC-PRICING-MODEL §5, ARCH-0023 |
 
