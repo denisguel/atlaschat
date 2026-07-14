@@ -106,7 +106,8 @@
 | Fase 3 #2: anti-silent-failure (mensaje intermedio a 8s + try/catch que siempre responde) + maxDuration=30 | HECHO | 2026-07-13 | ARCH-0025/0027 |
 | Fase 3 #3: higiene de contexto — al LLM solo datos filtrados (no excluidos); prohibido decir "no calculado" con target; herencia SSOT | HECHO | 2026-07-13 | ARCH-0029 / Principio 10 |
 | Fase 3 #4: toda escritura por BDVL (registro de reserva graba bdvl_decisions) | HECHO | 2026-07-13 | ARCH-0022/0026 |
-| Paso 4: scraper de competencia POR FECHA (Booking + motor lindabay.com.ar) | PENDIENTE | — | DOMAIN_KNOWLEDGE §1.5, ADR-015 |
+| Paso 4: arquitectura del scraper por fecha (adapters por tipo, competitor_sources, budget/org, techo 3 tipos, stay_date) | HECHO | 2026-07-13 | ARCH-0026, ADR-014 (ONBOARDING-COMPETITOR-SOURCES.md) |
+| Paso 4: fetch de precios REALES (Booking vía Bright Data / motor Reserva Directo) | BLOQUEADO | — | falta BRIGHTDATA_API_KEY o Playwright; motor de LindaBay exige sesión/JS. Arquitectura lista; degrada honesto |
 | Calendario de precios en dashboard | DIFERIDO | — | SPEC-PRICING-MODEL §5, ARCH-0023 |
 
 **Gaps de datos abiertos (reportados, no inventados — DOMAIN_KNOWLEDGE §3.2):**
