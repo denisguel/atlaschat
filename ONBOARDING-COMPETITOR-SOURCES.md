@@ -12,17 +12,20 @@ Insertar filas en `competitor_sources` eligiendo un **adapter_type existente** (
 
 | adapter_type | Cuándo usarlo | config (jsonb) |
 |---|---|---|
-| `booking` | Competencia de Booking.com (Bright Data mantiene el scraper) | `{ "dataset_id": "<id del dataset de Booking en Bright Data>" }` |
-| `direct_web` | Motor de reservas de una web propia/de complejo que expone un endpoint JSON por fecha | `{ "endpoint": "https://.../avail?in={check_in}&out={check_out}", "pricePath": "results[].price", "namePath": "results[].name" }` |
-| `direct_web` (motor con sesión/JS) | Motores tipo Reserva Directo/Octorate que exigen login o JS | `{ "requires_js": true }` → el sistema lo marca como "no fetch directo" y usa la tarifa histórica como ancla (Principio 15). Necesita Playwright o Bright Data para leer precios reales. |
+| `BOOKING_MANAGED` | Competencia de Booking.com (Bright Data mantiene el scraper) | `{ "dataset_id": "gd_mdy9ld3p1e0oqlj9g4", "hotel_urls": ["https://www.booking.com/hotel/ar/<hotel>.html", …], "adults": 4 }` |
+| `WEB_DIRECT_API` | Motor de reservas propio/de complejo con API JSON (ej. PXSOL) | `{ "endpoint": "https://…/list6", "method": "POST", "body_template": "<request EXACTO con {check_in}{check_out}{external_property_id}>", "external_property_id": 3883, "response": {"items_path":"…","sku_path":"…","rate_per_day_path":"RatePerDay","availability_path":"…"}, "sku_mapping": {"14014":"<unit_id>"} }` |
 
-Ejemplo (por SQL o, a futuro, por el dashboard):
+**Cómo capturar el `body_template` de un motor propio (sin código):** abrí el widget de reservas, DevTools → Network, hacé una consulta de fechas, encontrá el request al endpoint (ej. `list6`), copiá el **body** y pegalo en `config.body_template` reemplazando fechas por `{check_in}`/`{check_out}`. El adapter es genérico: la "recipe" vive en datos.
+
+Ejemplo:
 ```sql
 insert into competitor_sources (property_id, adapter_type, name, url, config, is_ceiling, active)
-values ('<property_id>', 'booking', 'Booking — mi zona',
-        'https://www.booking.com/searchresults.html?ss=<mi+destino>',
-        '{"dataset_id":"<dataset>"}', false, true);
+values ('<property_id>', 'BOOKING_MANAGED', 'Booking — mi zona',
+        'https://www.booking.com/hotel/ar/<hotel>.html',
+        '{"dataset_id":"gd_mdy9ld3p1e0oqlj9g4","hotel_urls":["https://www.booking.com/hotel/ar/<hotel>.html"]}', false, true);
 ```
+
+**Persistencia (SSOT):** los resultados van a `competitor_prices` (serie temporal por `stay_date`): `rate_per_day` completo (sin promediar), `availability` (para booking pace del mercado = delta entre capturas), `lead_time_days` (stay_date − scraped_date) y `unit_id` (mapeo por SKU).
 
 ### 2. Marcar cuál es su techo (ADR-014) — tres opciones, todas configurables
 - **(a) Una fuente scrapeada como techo:** poné `is_ceiling = true` en una fila de `competitor_sources` (ej. el complejo vecino más directo). El techo = su precio scrapeado **por fecha**.

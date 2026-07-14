@@ -108,8 +108,10 @@
 | Fase 3 #4: toda escritura por BDVL (registro de reserva graba bdvl_decisions) | HECHO | 2026-07-13 | ARCH-0022/0026 |
 | Paso 4: arquitectura del scraper por fecha (adapters por tipo, competitor_sources, budget/org, techo 3 tipos, stay_date) | HECHO | 2026-07-13 | ARCH-0026, ADR-014 (ONBOARDING-COMPETITOR-SOURCES.md) |
 | Paso 4: fetch de precios REALES de Booking vía Bright Data (dataset gd_mdy9ld3p1e0oqlj9g4) + competencia por fecha en analyze | HECHO | 2026-07-14 | key activa; evidencia real (Linda Bay 202 $136.67, 205 $125 por stay_date) |
-| Paso 4: motor Reserva Directo (techo) — exige sesión/JS, sin endpoint | PENDIENTE | — | scrapear vía Bright Data (web) o Playwright; hoy el techo cae al valor fijo configurado |
-| Paso 4: scheduling (cron diario 30 días) + mapeo por-unidad de competidores scrapeados | PENDIENTE | — | ARCH-0027 (el scrape corre por script/cron, no en el webhook: el poll tarda minutos) |
+| Paso 4: SSOT `competitor_prices` (serie temporal por stay_date) + adapter_type enum (BOOKING_MANAGED/WEB_DIRECT_API) | HECHO | 2026-07-14 | RFC-0008 |
+| Paso 4: WEB_DIRECT_API config-driven (PXSOL) + KPIs (RatePerDay sin promediar, availability→pace, lead_time, SKU→unidad) | HECHO | 2026-07-14 | ARCH-0026, RFC-0008 (parse probado con fixture) |
+| Paso 4: PXSOL fetch en vivo (Reserva Directo, el techo) | BLOQUEADO | — | adapter pega a la API real y relata su error; falta el `body_template` exacto (capturar request del widget → config, no código) |
+| Paso 4: scheduling (cron diario 30 días) + mapeo SKU 14014-14020 → UFs | PENDIENTE | — | ARCH-0027; el scrape corre por script/cron (poll de minutos), no en el webhook |
 | Calendario de precios en dashboard | DIFERIDO | — | SPEC-PRICING-MODEL §5, ARCH-0023 |
 
 **Gaps de datos abiertos (reportados, no inventados — DOMAIN_KNOWLEDGE §3.2):**
