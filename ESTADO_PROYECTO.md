@@ -112,7 +112,8 @@
 | Paso 4: WEB_DIRECT_API config-driven (PXSOL) + KPIs (RatePerDay sin promediar, availability→pace, lead_time, SKU→unidad) | HECHO | 2026-07-14 | ARCH-0026, RFC-0008 (parse probado con fixture) |
 | Paso 4: PXSOL fetch en vivo (Reserva Directo, el techo) | HECHO | 2026-07-14 | GET+Referer+SearchID capturado; SkuID 14014→UF214 = USD 175.44/noche real (250k ARS/blue) en competitor_prices |
 | Paso 4: flujo dos-pasos (init SearchID dinámico) + config .json + loader + cron resiliente | HECHO | 2026-07-14 | ARCH-0026/0027; testeado con fetch mock (init→SearchID→list6, ARS→USD, SKU→unidad) |
-| Paso 4: confirmar endpoint/payload del `insert` (SearchID por fecha) | PENDIENTE | — | lindabay.com.ar/search/insert dio 404 en pruebas; flujo listo, falta el search_form exacto del widget |
+| Paso 4: PXSOL DINÁMICO por fecha (insert real → SearchID → list6) | HECHO | 2026-07-14 | api-1-eb-web.pxsol.io/search/insert (302+Location); precios reales distintos por fecha (jul16 USD129.82 / jul20 USD175.44 → UF214) |
+| Paso 4: cron de acumulación activado (Booking + PXSOL dinámico) → serie temporal + marketPace | EN CURSO | 2026-07-14 | scripts/cron-scrape.mts; falta agendarlo (GitHub Actions/cron de máquina, diario) |
 | Paso 4: scheduling (cron diario 30 días) + mapeo SKU 14014-14020 → UFs | PENDIENTE | — | ARCH-0027; el scrape corre por script/cron (poll de minutos), no en el webhook |
 | Calendario de precios en dashboard | DIFERIDO | — | SPEC-PRICING-MODEL §5, ARCH-0023 |
 
