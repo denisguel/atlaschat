@@ -14,7 +14,15 @@
 
 **NO ES:** un hotel. No hay recepción, no hay tarifa diaria uniforme, no hay RevPAR clásico como métrica principal. Aplicar lógica de revenue management hotelero sin adaptar es el error \#1.
 
-**Diferencias críticas vs. hotelería tradicional:** | Hotel | STR Costa Atlántica | |---|---| | Tarifa por noche, todo el año | Tarifa por noche EN TEMPORADA BAJA; por PAQUETE/SEMANA en alta | | Estadía promedio 1-3 noches | Estadía promedio 7+ noches en alta, 2-4 en baja | | Ocupación pareja | Ocupación 90-100% en enero, 10-30% en junio | | Inventario grande, decisiones estadísticas | 1-5 unidades: cada reserva mueve la aguja materialmente | | Precio en moneda estable | Precio en un contexto de inflación/dólar volátil |
+**Diferencias críticas vs. hotelería tradicional:**
+
+| Hotel | STR Costa Atlántica |
+|---|---|
+| Tarifa por noche, todo el año | Tarifa por noche EN TEMPORADA BAJA; por PAQUETE/SEMANA en alta |
+| Estadía promedio 1-3 noches | Estadía promedio 7+ noches en alta, 2-4 en baja |
+| Ocupación pareja | Ocupación 90-100% en enero, 10-30% en junio |
+| Inventario grande, decisiones estadísticas | 1-5 unidades: cada reserva mueve la aguja materialmente |
+| Precio en moneda estable | Precio en un contexto de inflación/dólar volátil |
 
 ## 1.2 Estructura de temporadas (Costa Atlántica — Mar de las Pampas)
 
@@ -167,9 +175,25 @@ Marco de decisión:
 
 ## 2.4 KPIs relevantes (adaptados a STR, no hotel)
 
-**PRIMARIOS (los que el propietario mira):** | KPI | Fórmula | Por qué | |---|---|---| | **Revenue total del período** | Σ (precio × noches vendidas) | Lo que importa al final | | **Tasa de ocupación** | Noches vendidas / noches disponibles | Salud del negocio | | **ADR (Average Daily Rate)** | Revenue / noches vendidas | Precio promedio real obtenido | | **RevPAN (Revenue per Available Night)** | Revenue / noches disponibles | **El más importante**: combina precio y ocupación. Sube si vendés más caro O más noches |
+**PRIMARIOS (los que el propietario mira):**
 
-**SECUNDARIOS (diagnóstico):** | KPI | Qué diagnostica | |---|---| | **Booking pace** (reservas acumuladas vs. mismo momento año anterior) | ¿Voy adelantado o atrasado? | | **Lead time promedio** | ¿Con cuánta anticipación compran? Define cuándo actuar | | **Gap nights ratio** | % de noches sueltas no vendidas | | **Tasa de cancelación** | Riesgo de revenue | | **Estadía promedio (ALOS)** | ¿Se respetan los mínimos? | | **% reservas directas vs. OTA** | Cada reserva directa ahorra 15-18% de comisión — **es margen puro** |
+| KPI | Fórmula | Por qué |
+|---|---|---|
+| **Revenue total del período** | Σ (precio × noches vendidas) | Lo que importa al final |
+| **Tasa de ocupación** | Noches vendidas / noches disponibles | Salud del negocio |
+| **ADR (Average Daily Rate)** | Revenue / noches vendidas | Precio promedio real obtenido |
+| **RevPAN (Revenue per Available Night)** | Revenue / noches disponibles | **El más importante**: combina precio y ocupación. Sube si vendés más caro O más noches |
+
+**SECUNDARIOS (diagnóstico):**
+
+| KPI | Qué diagnostica |
+|---|---|
+| **Booking pace** (reservas acumuladas vs. mismo momento año anterior) | ¿Voy adelantado o atrasado? |
+| **Lead time promedio** | ¿Con cuánta anticipación compran? Define cuándo actuar |
+| **Gap nights ratio** | % de noches sueltas no vendidas |
+| **Tasa de cancelación** | Riesgo de revenue |
+| **Estadía promedio (ALOS)** | ¿Se respetan los mínimos? |
+| **% reservas directas vs. OTA** | Cada reserva directa ahorra 15-18% de comisión — **es margen puro** |
 
 **KPI ESTRATÉGICO (el que justifica que ATLAS exista):**
 
@@ -288,7 +312,14 @@ pace\_referencia \= noches vendidas para \[mismo período\] a la misma distancia
 
 ratio \= pace\_actual / pace\_referencia
 
-**Interpretación:** | Ratio | Diagnóstico | Acción | |---|---|---| | \> 1.15 | **Adelantado** — se vende más rápido que el histórico | Oportunidad de SUBIR precio: hay más demanda que la esperada | | 0.85 – 1.15 | **En línea** | Mantener, ajuste fino | | 0.60 – 0.85 | **Atrasado** | Revisar precio vs. competencia. Considerar bajar o promocionar | | \< 0.60 | **Muy atrasado — alerta** | Acción correctiva urgente: bajar precio, promocionar, revisar si hay problema de mercado (no solo de precio) |
+**Interpretación:**
+
+| Ratio | Diagnóstico | Acción |
+|---|---|---|
+| \> 1.15 | **Adelantado** — se vende más rápido que el histórico | Oportunidad de SUBIR precio: hay más demanda que la esperada |
+| 0.85 – 1.15 | **En línea** | Mantener, ajuste fino |
+| 0.60 – 0.85 | **Atrasado** | Revisar precio vs. competencia. Considerar bajar o promocionar |
+| \< 0.60 | **Muy atrasado — alerta** | Acción correctiva urgente: bajar precio, promocionar, revisar si hay problema de mercado (no solo de precio) |
 
 **Ajuste por cercanía:** el mismo ratio significa cosas distintas según cuánto falte:
 
@@ -325,7 +356,13 @@ Revenue \= precio × noches vendidas
 
 ## 5.4 Revenue Simulator / What-if (RFC-0008 §28, operacionalizado)
 
-**Qué debe simular:** | Escenario | Proyecta | |---|---| | Mantener precio actual | Ocupación esperada (según pace \+ histórico), revenue proyectado | | Subir X% | Ocupación esperada (menor), revenue proyectado | | Bajar X% | Ocupación esperada (mayor), revenue proyectado |
+**Qué debe simular:**
+
+| Escenario | Proyecta |
+|---|---|
+| Mantener precio actual | Ocupación esperada (según pace \+ histórico), revenue proyectado |
+| Subir X% | Ocupación esperada (menor), revenue proyectado |
+| Bajar X% | Ocupación esperada (mayor), revenue proyectado |
 
 **Salida esperada (lo que ve el propietario):**
 
@@ -396,7 +433,13 @@ Caso difícil (real): inflación 30% en pesos, dólar sube solo 5%.
 - Si actualizás por INFLACIÓN (+30%): tu precio en dólares se dispara → superás el techo (Brasil) → el huésped se va al exterior  
 - Si actualizás por DÓLAR (+5%): no cubrís el aumento de tus costos en pesos → perdés margen
 
-**El marco correcto — piso y techo:** | Límite | Qué lo define | Moneda de referencia | |---|---|---| | **PISO** (mínimo viable) | Tus costos: expensas, servicios, mantenimiento | Pesos / inflación (tenés que cubrirlos) | | **TECHO** (máximo de mercado) | Destino alternativo (Brasil), competencia | Dólar (§1.4) | | **ÓPTIMO** | Vive ENTRE piso y techo, según demanda/pace | Se busca en esa banda |
+**El marco correcto — piso y techo:**
+
+| Límite | Qué lo define | Moneda de referencia |
+|---|---|---|
+| **PISO** (mínimo viable) | Tus costos: expensas, servicios, mantenimiento | Pesos / inflación (tenés que cubrirlos) |
+| **TECHO** (máximo de mercado) | Destino alternativo (Brasil), competencia | Dólar (§1.4) |
+| **ÓPTIMO** | Vive ENTRE piso y techo, según demanda/pace | Se busca en esa banda |
 
 **Regla:** el precio óptimo no sale de una fórmula de "ajustar X%". Sale de encontrar el punto de la banda \[piso, techo\] que maximiza revenue según la demanda esperada. Si el piso supera al techo (costos crecieron más que lo que el mercado tolera), el sistema debe ALERTAR — es una señal de negocio grave (el margen se hizo negativo), no un precio a recomendar.
 
