@@ -89,6 +89,7 @@
 ### Parte 2 — Inteligencia de decisión (EN CURSO)
 | Ítem | Estado | Fecha | Respaldo |
 |---|---|---|---|
+| Ingestor de RESERVAS (Excel/CSV arbitrario, mismo pipeline L1 que precios): mapeo L1 de columnas + unidad por alias (matchesHint) + normalización determinista + preview→--apply. Migración `reservations`+booking_date/pax/fx. §5.2: ocupación/gaps sí, pace histórico NO (booking_date NULL). Reservas NUEVAS capturan booking_date=hoy → pace desde ahora | HECHO | 2026-07-17 | tsc=0, 92/92; preview real: columnas raras mapeadas, alias→unidad, sin-booking y cancelada bien clasificadas, ambiguas marcadas |
 | Paso 1a: inferir unit_rates desde pricing_history real (source='inferred_from_history') | HECHO | 2026-07-11 | DOMAIN_KNOWLEDGE §3.3 |
 | Paso 1b: reconectar competencia real con ajuste de comparabilidad numérico (adjustment_pct) | HECHO | 2026-07-11 | DOMAIN_KNOWLEDGE §1.6 |
 | Paso 2: motor de decisión (analyze.ts): tarifa + competencia ajustada + ocupación histórica + techo → subir/bajar/mantener con justificación | HECHO | 2026-07-11 | DOMAIN_KNOWLEDGE §2.3 |
