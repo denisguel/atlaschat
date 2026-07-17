@@ -1,6 +1,6 @@
 # ESTADO DEL PROYECTO ATLAS — Tablero Único de Verdad
 
-**Última actualización:** 2026-07-11
+**Última actualización:** 2026-07-15
 **Mantenimiento:** este archivo se actualiza al cerrar CUALQUIER tarea, sin pedirlo (instrucción del founder). Es la vista de secuencialidad y objetivos.
 **Fuente de verdad de decisiones:** los ADR/DOC referenciados en cada fila. Si una fila y su ADR se contradicen, gana el ADR y se corrige la fila.
 
@@ -114,6 +114,15 @@
 | Paso 4: flujo dos-pasos (init SearchID dinámico) + config .json + loader + cron resiliente | HECHO | 2026-07-14 | ARCH-0026/0027; testeado con fetch mock (init→SearchID→list6, ARS→USD, SKU→unidad) |
 | Paso 4: PXSOL DINÁMICO por fecha (insert real → SearchID → list6) | HECHO | 2026-07-14 | api-1-eb-web.pxsol.io/search/insert (302+Location); precios reales distintos por fecha (jul16 USD129.82 / jul20 USD175.44 → UF214) |
 | Paso 4: cron de acumulación activado (Booking + PXSOL dinámico) → serie temporal + marketPace | EN CURSO | 2026-07-14 | scripts/cron-scrape.mts; falta agendarlo (GitHub Actions/cron de máquina, diario) |
+| Diagnóstico de respuestas Telegram deficientes (4 casos, dato crudo: router/motor/BDVL) | HECHO | 2026-07-15 | evidencia real por caso; ningún quiebre en BDVL — 3 motor, 1 feature inexistente |
+| Fix CASO 1: `resolveUnits` — el filtro capacity>=pax NUNCA se saltea con hint; conflicto de capacidad se avisa con alternativas (no se ofrece unidad chica) | HECHO | 2026-07-15 | DOMAIN_KNOWLEDGE §3.2; test (pax5+mono→conflict, pax2+mono→match) + corrida real UF214/UF508 |
+| Fix CASO 2: comparabilidad de competidores por SKU o capacidad; los no mapeables se EXCLUYEN (fin del "arrastra todo Booking" por unit_id NULL). Migración `comparable_capacity` + adapter Booking captura ocupación | HECHO | 2026-07-15 | DOMAIN_KNOWLEDGE §1.6; `isComparableCompetitor` testeado + corrida real (mono cap4 solo trae SKU-mono + cap4) |
+| CASO 3 / Problema 1: EDITOR DE REGLAS por Telegram (BDVL-gated). intent `modify_rate` + `extractRateEdit` (L2, estructura estricta) + `proposeRateEdit` (L0, valida+BDVL requires_confirmation) + `applyRateEdit` (escribe rate_seasons/unit_rates SOLO tras /aprobar, approved_by real). Guard: /aprobar sin id con >1 pendiente pide el id | HECHO | 2026-07-16 | e2e real en temporada descartable: mensaje→propuesta con id→/aprobar→"7n eliminado; 3n→USD250; mínimo→3" + verificación DB + BDVL approved. tsc=0, 83/83 |
+| Fix cotización (verificado con el MENSAJE REAL del LLM, no en aislamiento): (2) "N personas" ya no queda pegado a una unidad heredada → muestra todas por capacidad; (3) fallback manual filtra por unidad + payload capa a top-5 más cercanos con total; (4) techo visible ("Techo: USD X según fuente") | HECHO | 2026-07-16 | corrida e2e: UF214+UF508, 5 competidores + "9 comparables", "Techo USD 180" |
+| Fix CASO 4: `resolveCeiling` lee el techo scrapeado de `competitor_prices` (SSOT) por `source_id` de la fuente `is_ceiling` + comparabilidad. Config-driven (flag is_ceiling), NO hardcodeado a LindaBay/PXSOL (ADR-014) | HECHO | 2026-07-16 | corrida real: techo UF214 = USD 129.82 (jul16) / 175.44 (jul20) desde "Reserva Directo" is_ceiling; antes null. Test ceiling.ts (5 casos) + predicado compartido `comparability.ts` (sin ciclo) |
+| Auditoría Telegram A (seguridad): autorización de chats. Tablas `telegram_link_tokens` + `telegram_links` (RLS), gate en `routeInbound` (solo chats vinculados a la org operan), `/vincular <token>` single-use generado en `/console/telegram`, `approved_by` = user_id real | HECHO | 2026-07-16 | corrida real e2e: no-vinculado→rechazado, token single-use, aislamiento por org, approved_by real. Test telegram-auth (9 casos) |
+| Auditoría Telegram B (formato): el ADAPTER arma el formato (no el LLM) en HTML seguro (parse_mode=HTML + escaping `&<>`), negrita real, fallback a texto plano. Fin de asteriscos literales; caracteres especiales no rompen el envío | HECHO | 2026-07-16 | test telegram-format (6 casos, incluye nombre con guion/paréntesis y URL con especiales) |
+| Auditoría Telegram C (dead code): removido `handleAvailability` (0 refs, cubierto por Orchestrator). `handlePricing`/`fmt*` NO se borran: son la superficie de dry-run de scripts (show-pricing/show-quote) — auditoría previa corregida | HECHO | 2026-07-16 | grep de referencias; tsc=0 + 81/81 tras la limpieza |
 | Paso 4: scheduling (cron diario 30 días) + mapeo SKU 14014-14020 → UFs | PENDIENTE | — | ARCH-0027; el scrape corre por script/cron (poll de minutos), no en el webhook |
 | Calendario de precios en dashboard | DIFERIDO | — | SPEC-PRICING-MODEL §5, ARCH-0023 |
 
