@@ -128,7 +128,8 @@
 | Auditoría Telegram C (dead code): removido `handleAvailability` (0 refs, cubierto por Orchestrator). `handlePricing`/`fmt*` NO se borran: son la superficie de dry-run de scripts (show-pricing/show-quote) — auditoría previa corregida | HECHO | 2026-07-16 | grep de referencias; tsc=0 + 81/81 tras la limpieza |
 | Ingesta de reservas reales (30 reservas, 98 noches) + fila marzo completada en SSOT | HECHO | 2026-07-17 | preview→upsert; ARS→USD blue derivado; dedup verificado |
 | Ocupación real + gap nights (§5.1/§2.3): `occupancyInWindow` + `detectGapNights` (puras), ocupación del mes + periodBooked + detección de gaps por temporada + señal direccional por ocupación (proxy del pace) + confianza low→medium/high. dataGaps deja de listar ocupación/gaps | HECHO | 2026-07-17 | e2e real: mar 36% periodBooked=true; finde largo ago tarifa+regla+detección; tsc=0, 99/99 (7 tests nuevos) |
-| Paso 4: scheduling (cron diario 30 días) + mapeo SKU 14014-14020 → UFs | PENDIENTE | — | ARCH-0027; el scrape corre por script/cron (poll de minutos), no en el webhook |
+| Scraper de Horizonte (ADR-015): cron HOY..+180d, backoff (vacía→3d, con datos→7d) en `competitor_scrape_state`, alimenta `competitor_prices` (SSOT); `effectiveCeiling` (decision.ts) — el techo scrapeado desplaza al configurado; property_id EXPLÍCITO (aislamiento); cambio de techo ≥15% → execution_logs (BDVL) | HECHO | 2026-07-18 | e2e real: sin fuga entre propiedades, backoff 3d, cambio +38% highRisk logueado, effectiveCeiling capa con scrapeado. tsc=0, 109/109 |
+| Paso 4: agendar el cron (GitHub Actions/cron externo) — el worker existe, falta el scheduler | PENDIENTE | — | ARCH-0027; corre por script (Booking poll de minutos), no en el webhook |
 | Calendario de precios en dashboard | DIFERIDO | — | SPEC-PRICING-MODEL §5, ARCH-0023 |
 
 **Gaps de datos abiertos (reportados, no inventados — DOMAIN_KNOWLEDGE §3.2):**
