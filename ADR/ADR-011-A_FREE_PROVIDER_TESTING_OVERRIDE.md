@@ -104,3 +104,29 @@ prueba el camino L3.
 1. [ ] Al validar LindaBay + cargar saldo Claude: `REVENUE_AGENT_PROVIDER=claude` (o remover la var)
 2. [ ] Chequeo pre-producción: `execution_logs.provider` debe mostrar `claude:*` en L3/L4, nunca `groq:*`/`gemini:*`
 3. [ ] Mantener la abstracción `PricingProvider` (ADR-008) como el único punto de selección de proveedor
+
+## Enmienda 2026-07-18 — Cadena de proveedores gratuitos con fallback (L1-L2)
+
+El free tier de Groq satura (429 / over-capacity), dejando errores en Telegram. Para
+resiliencia SIN pasar a proveedor pago, `callFreeJson` (capa abstracta ADR-008) usa una
+CADENA de proveedores gratuitos con fallback automatico, en este orden:
+
+1. **Groq** (primario) — LPU, el mas rapido; free tier con rate limit agresivo.
+2. **Nemotron** (NVIDIA NIM, `integrate.api.nvidia.com`, OpenAI-compatible) — free tier
+   estable, buena calidad L1-L2, ~1.5s. Modelo: `nvidia/llama-3.3-nemotron-super-49b-v1`
+   (el `70b-instruct` no esta disponible en la cuenta).
+3. **Gemini** (`gemini-flash-latest`) — ultimo recurso; su quota fue inestable
+   (`gemini-2.0-flash*` devuelven `limit: 0`).
+
+Reglas: el retry con backoff cubre 429, over-capacity (5xx/mensaje) y timeouts/errores de
+red (AbortController + timeout de cliente). Si un proveedor agota sus reintentos, cae al
+siguiente; el proveedor usado queda marcado `(fallback)` en `execution_logs`. Si TODOS
+fallan, se lanza `ProviderSaturatedError` y el bot responde un mensaje claro (nunca mudo).
+
+**DeepSeek se evaluo y descarto** como proveedor gratuito: su API es PAGA (la key de
+prueba devolvio `402 Insufficient Balance`); no tiene free tier tipo Groq/Gemini/NVIDIA.
+
+Config: `NEMOTRON_API_KEY`, y overrides opcionales `REVENUE_AGENT_L1_NEMOTRON_MODEL`,
+`FREE_LLM_TIMEOUT_MS`, `FREE_LLM_MAX_RETRIES` (ver .env.example). No cambia la politica de
+PRODUCCION de ADR-011 (Claude en L3/L4 cuando haya saldo): esto es la capa GRATUITA de L1-L2.
+
