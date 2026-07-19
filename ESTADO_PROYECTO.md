@@ -1,6 +1,6 @@
 # ESTADO DEL PROYECTO ATLAS — Tablero Único de Verdad
 
-**Última actualización:** 2026-07-15
+**Última actualización:** 2026-07-19
 **Mantenimiento:** este archivo se actualiza al cerrar CUALQUIER tarea, sin pedirlo (instrucción del founder). Es la vista de secuencialidad y objetivos.
 **Fuente de verdad de decisiones:** los ADR/DOC referenciados en cada fila. Si una fila y su ADR se contradicen, gana el ADR y se corrige la fila.
 
@@ -131,6 +131,9 @@
 | Scraper de Horizonte (ADR-015): cron HOY..+180d, backoff (vacía→3d, con datos→7d) en `competitor_scrape_state`, alimenta `competitor_prices` (SSOT); `effectiveCeiling` (decision.ts) — el techo scrapeado desplaza al configurado; property_id EXPLÍCITO (aislamiento); cambio de techo ≥15% → execution_logs (BDVL) | HECHO | 2026-07-18 | e2e real: sin fuga entre propiedades, backoff 3d, cambio +38% highRisk logueado, effectiveCeiling capa con scrapeado. tsc=0, 109/109 |
 | Resiliencia proveedor gratuito (Telegram): CADENA con fallback Groq→Nemotron(NVIDIA NIM)→Gemini; retry cubre 429/over-capacity/timeout+red; ProviderSaturatedError → mensaje claro (nunca mudo, incl. webhook). DeepSeek descartado (API paga, 402). Docs: ADR-011-A + .env.example | HECHO | 2026-07-18 | tsc=0, 115/115; e2e: Groq falla→Nemotron responde en vivo, los 3 caídos→mensaje de saturación |
 | Scheduler del Scraper de Horizonte: GitHub Actions (`.github/workflows/scrape-horizon.yml`) diario 06:00 UTC + dispatch manual. Secrets en GitHub Secrets. Free-tier: fuentes baratas primero (PXSOL antes que Booking), --max 40, tope mensual `SCRAPE_CREDITS_LIMIT` (default 3000), log de créditos por corrida, fallo sistémico→rojo | HECHO | 2026-07-18 | workflow activo en main; tsc=0, 115/115 |
+| PXSOL "sin tarifa publicada" (disponibilidad 0 + precio centinela 99999999999 = carga discontinua, NO error) → adapter devuelve `ok:true` count 0; el cron separa fallas (ok:false) de vacías | HECHO | 2026-07-19 | commit 9ab3d25; corrida 40 escaneadas/0 con datos diagnosticada (no era falla, era no-publicado) |
+| §3.4 CASO síntoma 3: nombrar una temporada sin fechas ("vacaciones de invierno") → ATLAS ASUME sus fechas cargadas (`resolveSeasonMention`, determinístico) en vez de pedir fechas conocidas | HECHO | 2026-07-19 | commit 63aed00; test season-dates (5 casos) |
+| §3.4 modify_rate lee FECHAS como contexto de temporada: "eliminar restricción desde hoy al 3/8" → `seasonCoveringDate` resuelve "Vacaciones invierno" (antes: "no sé qué temporada"). extractRateEdit mapea "eliminar/sacar/quitar restricción / sin mínimo"→set_min_nights:1 y season_hint es NOMBRE-only. §3.2 honestidad: en temporada por PAQUETE avisa que bajar el mínimo no habilita noches sueltas sin tarifa por noche | HECHO | 2026-07-19 | commit 244699e; e2e real 3 frases (invierno 4→1, eliminar por fechas, sacar mínimo); tsc=0, 120/120 |
 | Calendario de precios en dashboard | DIFERIDO | — | SPEC-PRICING-MODEL §5, ARCH-0023 |
 
 **Gaps de datos abiertos (reportados, no inventados — DOMAIN_KNOWLEDGE §3.2):**
